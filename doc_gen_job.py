@@ -68,7 +68,7 @@ def process_changed_files(changed_files):
     for file in changed_files:
         try:
             print(f"Processing file: {file}")
-            print("Current directory contents:", os.listdir('entservices-apis'))
+            print("entservices-apis directory contents:", os.listdir('entservices-apis'))
             run_command(f"python3 entservices-apis/tools/md_from_h_generator/generate_md_from_header.py entservices-apis/{file}")
         except Exception as e:
             print(f"Failed to process file: {file}")
@@ -91,6 +91,7 @@ def archive_artifacts():
 def create_pull_request(docs_folder, github_creds, github_repo, branch, user_email, user_name):
     """Stage: Create Pull Request"""
     print("Stage: Create Pull Request")
+    print("jenkins_generated_docs directory contents:", os.listdir('jenkins_generated_docs'))
     commands = f"""
     cd entservices-apis
     cp -r jenkins_generated_docs/*.md {docs_folder}/ || echo "No files to copy."
