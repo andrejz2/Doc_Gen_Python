@@ -53,7 +53,6 @@ def check_for_changes(apis_folder):
     if changed_files:
         os.makedirs('generated_docs', exist_ok=True)
         os.makedirs('logs', exist_ok=True)
-        os.makedirs('jenkins_generated_docs', exist_ok=True)
         print(f"Changed .h files in the last week:\n{changed_files}")
         return changed_files.splitlines()
     else:
@@ -109,17 +108,6 @@ def create_pull_request(docs_folder, github_creds, github_repo, branch, user_ema
     """
     run_command(pr_command)
 
-def cleanup_directories(directories):
-    """Cleanup temporary directories."""
-    print("Cleaning up temporary directories...")
-    for directory in directories:
-        if os.path.exists(directory):
-            try:
-                shutil.rmtree(directory)
-                print(f"Deleted directory: {directory}")
-            except Exception as e:
-                print(f"Failed to delete directory {directory}: {e}")
-
 def main():
     parser = argparse.ArgumentParser(description="Run the documentation generation job.")
     parser.add_argument("-u", "--username", required=True, help="GitHub username")
@@ -146,8 +134,6 @@ def main():
     except Exception as e:
         print(f"Pipeline failed: {e}")
         sys.exit(1)
-    finally:
-        cleanup_directories(['entservices-apis', 'generated_docs', 'logs'])
 
 if __name__ == "__main__":
     main()
