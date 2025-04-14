@@ -126,7 +126,7 @@ def main():
     TOOLS_FOLDER = 'tools'
 
     try:
-        checkout_code(APIS_FOLDER, DOCS_FOLDER, GITHUB_REPO, 'develop', GITHUB_CREDS)
+        checkout_code(APIS_FOLDER, DOCS_FOLDER, TOOLS_FOLDER, GITHUB_REPO, 'develop', GITHUB_CREDS)
         changed_files = check_for_changes(APIS_FOLDER)
         process_changed_files(changed_files)
         create_pull_request(DOCS_FOLDER, GITHUB_CREDS, GITHUB_REPO, BRANCH, USER_EMAIL, USER_NAME)
