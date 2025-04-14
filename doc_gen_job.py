@@ -67,7 +67,7 @@ def process_changed_files(changed_files):
         try:
             print(f"Processing file: {file}")
             print("Current directory contents:", os.listdir(os.getcwd()))
-            run_command(f"python3 tools/md_from_h_generator/generate_md_from_header.py {file}")
+            run_command(f"python3 entservices-apis/tools/md_from_h_generator/generate_md_from_header.py entservices-apis/{file}")
         except Exception as e:
             print(f"Failed to process file: {file}")
             failed_files.append(file)
@@ -91,7 +91,7 @@ def create_pull_request(docs_folder, github_creds, github_repo, branch, user_ema
     print("Stage: Create Pull Request")
     commands = f"""
     cd entservices-apis
-    cp -r ../jenkins_generated_docs/*.md {docs_folder}/ || echo "No files to copy."
+    cp -r jenkins_generated_docs/*.md {docs_folder}/ || echo "No files to copy."
     git config --global user.email "{user_email}"
     git config --global user.name "{user_name}"
     git checkout -b update-docs
