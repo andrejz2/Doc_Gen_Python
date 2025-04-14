@@ -52,6 +52,8 @@ def check_for_changes(apis_folder):
     changed_files = run_command(command, capture_output=True)
     if changed_files:
         os.makedirs('generated_docs', exist_ok=True)
+        os.makedirs('logs', exist_ok=True)
+        os.makedirs('jenkins_generated_docs', exist_ok=True)
         print(f"Changed .h files in the last week:\n{changed_files}")
         return changed_files.splitlines()
     else:
@@ -61,8 +63,6 @@ def check_for_changes(apis_folder):
 def process_changed_files(changed_files):
     """Stage: Process Changed Files"""
     print("Stage: Process Changed Files")
-    os.makedirs('logs', exist_ok=True)
-    os.makedirs('jenkins_generated_docs', exist_ok=True)
     failed_files = []
 
     for file in changed_files:
@@ -91,7 +91,7 @@ def archive_artifacts():
 def create_pull_request(docs_folder, github_creds, github_repo, branch, user_email, user_name):
     """Stage: Create Pull Request"""
     print("Stage: Create Pull Request")
-    print("jenkins_generated_docs directory contents:", os.listdir('jenkins_generated_docs'))
+    print("Current directory contents:", os.listdir(os.getcwd()))
     commands = f"""
     cd entservices-apis
     cp -r jenkins_generated_docs/*.md {docs_folder}/ || echo "No files to copy."
