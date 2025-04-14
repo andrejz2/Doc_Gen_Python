@@ -79,22 +79,13 @@ def process_changed_files(changed_files):
         with open('logs/failed_files.log', 'w') as log_file:
             log_file.write('\n'.join(failed_files))
 
-def archive_artifacts():
-    """Stage: Archive Artifacts"""
-    print("Stage: Archive Artifacts")
-    if os.path.exists('jenkins_generated_docs'):
-        print("Archiving generated documentation...")
-        shutil.make_archive('jenkins_generated_docs', 'zip', 'jenkins_generated_docs')
-    else:
-        print("No artifacts to archive.")
-
 def create_pull_request(docs_folder, github_creds, github_repo, branch, user_email, user_name):
     """Stage: Create Pull Request"""
     print("Stage: Create Pull Request")
     print("generated_docs directory contents:", os.listdir('generated_docs'))
     commands = f"""
     cd entservices-apis
-    cp -r jenkins_generated_docs/*.md {docs_folder}/ || echo "No files to copy."
+    cp -r generated_docs/*.md {docs_folder}/ || echo "No files to copy."
     git config --global user.email "{user_email}"
     git config --global user.name "{user_name}"
     git checkout -b update-docs
@@ -138,7 +129,6 @@ def main():
         checkout_code(APIS_FOLDER, DOCS_FOLDER, GITHUB_REPO, 'develop', GITHUB_CREDS)
         changed_files = check_for_changes(APIS_FOLDER)
         process_changed_files(changed_files)
-        archive_artifacts()
         create_pull_request(DOCS_FOLDER, GITHUB_CREDS, GITHUB_REPO, BRANCH, USER_EMAIL, USER_NAME)
         print("Pipeline completed successfully!")
     except Exception as e:
