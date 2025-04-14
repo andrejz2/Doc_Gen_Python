@@ -22,7 +22,7 @@ def run_command(command, cwd=None, capture_output=False):
         print(f"Error message: {e.stderr if e.stderr else e}")
         sys.exit(1)
 
-def checkout_code(apis_folder, docs_folder, github_repo, branch, github_creds):
+def checkout_code(apis_folder, docs_folder, tools_folder, github_repo, branch, github_creds):
     """Stage: Checkout"""
     print("Stage: Checkout")
     if os.path.exists('entservices-apis'):
@@ -35,7 +35,7 @@ def checkout_code(apis_folder, docs_folder, github_repo, branch, github_creds):
     git config core.sparseCheckout true
     echo "{apis_folder}" >> .git/info/sparse-checkout
     echo "{docs_folder}" >> .git/info/sparse-checkout
-    echo "tools" >> .git/info/sparse-checkout
+    echo "{tools_folder}" >> .git/info/sparse-checkout
     git remote add origin https://{github_creds}@github.com/{github_repo}.git
     git fetch origin {branch}
     git reset --hard origin/{branch}
@@ -84,8 +84,7 @@ def create_pull_request(docs_folder, github_creds, github_repo, branch, user_ema
     print("Stage: Create Pull Request")
     print("generated_docs directory contents:", os.listdir('generated_docs'))
     commands = f"""
-    cd entservices-apis
-    cp -r generated_docs/*.md {docs_folder}/ || echo "No files to copy."
+    cp -r generated_docs/*.md entservices-apis/{docs_folder}/apis/ || echo "No files to copy."
     git config --global user.email "{user_email}"
     git config --global user.name "{user_name}"
     git checkout -b update-docs
@@ -124,6 +123,7 @@ def main():
     USER_EMAIL = 'azerom960@cable.comcast.com'
     APIS_FOLDER = 'apis'
     DOCS_FOLDER = 'docs'
+    TOOLS_FOLDER = 'tools'
 
     try:
         checkout_code(APIS_FOLDER, DOCS_FOLDER, GITHUB_REPO, 'develop', GITHUB_CREDS)
