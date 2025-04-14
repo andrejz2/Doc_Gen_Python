@@ -130,7 +130,7 @@ def main():
     GITHUB_CREDS = args.password
     USER_EMAIL = 'azerom960@cable.comcast.com'
     APIS_FOLDER = 'apis'
-    DOCS_FOLDER = 'docs/apis_from_h'
+    DOCS_FOLDER = 'docs'
 
     try:
         checkout_code(APIS_FOLDER, DOCS_FOLDER, GITHUB_REPO, 'develop', GITHUB_CREDS)
