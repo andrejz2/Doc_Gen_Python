@@ -91,7 +91,7 @@ def archive_artifacts():
 def create_pull_request(docs_folder, github_creds, github_repo, branch, user_email, user_name):
     """Stage: Create Pull Request"""
     print("Stage: Create Pull Request")
-    print("Current directory contents:", os.listdir(os.getcwd()))
+    print("generated_docs directory contents:", os.listdir('generated_docs))
     commands = f"""
     cd entservices-apis
     cp -r jenkins_generated_docs/*.md {docs_folder}/ || echo "No files to copy."
