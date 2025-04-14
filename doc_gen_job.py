@@ -131,7 +131,7 @@ def main():
     DOCS_FOLDER = 'docs/apis_from_h'
 
     try:
-        checkout_code(APIS_FOLDER, DOCS_FOLDER, GITHUB_REPO, BRANCH, GITHUB_CREDS)
+        checkout_code(APIS_FOLDER, DOCS_FOLDER, GITHUB_REPO, 'develop', GITHUB_CREDS)
         changed_files = check_for_changes(APIS_FOLDER)
         process_changed_files(changed_files)
         archive_artifacts()
