@@ -35,6 +35,7 @@ def checkout_code(apis_folder, docs_folder, github_repo, branch, github_creds):
     git config core.sparseCheckout true
     echo "{apis_folder}" >> .git/info/sparse-checkout
     echo "{docs_folder}" >> .git/info/sparse-checkout
+    echo "tools" >> .git/info/sparse-checkout
     git remote add origin https://{github_creds}@github.com/{github_repo}.git
     git fetch origin {branch}
     git reset --hard origin/{branch}
