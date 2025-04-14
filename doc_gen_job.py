@@ -51,6 +51,7 @@ def check_for_changes(apis_folder):
     """
     changed_files = run_command(command, capture_output=True)
     if changed_files:
+        os.makedirs('generated_docs', exist_ok=True)
         print(f"Changed .h files in the last week:\n{changed_files}")
         return changed_files.splitlines()
     else:
