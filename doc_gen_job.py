@@ -66,7 +66,7 @@ def process_changed_files(changed_files):
     for file in changed_files:
         try:
             print(f"Processing file: {file}")
-            run_command("ls")
+            print("Current directory contents:", os.listdir(os.getcwd()))
             run_command(f"python3 tools/md_from_h_generator/generate_md_from_header.py {file}")
         except Exception as e:
             print(f"Failed to process file: {file}")
