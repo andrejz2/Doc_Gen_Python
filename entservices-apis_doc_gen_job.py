@@ -64,6 +64,7 @@ def process_changed_files(changed_files):
     print("Stage: Process Changed Files")
     failed_files = []
     run_command("cd entservices-apis")
+    run_command("ls")
 
     for file in changed_files:
         try:
