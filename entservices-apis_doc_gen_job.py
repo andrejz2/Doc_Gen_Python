@@ -82,7 +82,6 @@ def process_changed_files(changed_files):
 def create_pull_request(docs_folder, github_creds, github_repo, branch, user_email, user_name):
     """Stage: Create Pull Request"""
     print("Stage: Create Pull Request")
-    print("generated_docs directory contents:", os.listdir('generated_docs'))
     commands = f"""
     cp -r tools/md_from_h_generator/generated_docs/*.md {docs_folder}/apis/ || echo "No files to copy."
     rm -rf tools/md_from_h_generator/generated_docs/*
