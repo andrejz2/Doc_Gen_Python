@@ -68,6 +68,9 @@ def process_changed_files(changed_files):
 
     for file in changed_files:
         try:
+            run_command("cd entservices-apis")
+            run_command('echo "neted ls"')
+            run_command("ls")
             print(f"Processing file: {file}")
             run_command(f"python3 tools/md_from_h_generator/generate_md_from_header.py {file}")
         except Exception as e:
