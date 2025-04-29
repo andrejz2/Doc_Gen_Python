@@ -92,7 +92,7 @@ def create_pull_request(docs_folder, github_creds, github_repo, branch, user_ema
     echo "ls tools/md_from_h_generator/generated_docs"
     ls tools/md_from_h_generator/generated_docs
     cp -r tools/md_from_h_generator/generated_docs/*.md {docs_folder}/apis/ || echo "No files to copy."
-    rm -v tools/md_from_h_generator/generated_docs !("test.md")
+    rm -rf tools/md_from_h_generator/generated_docs/*
     git config --global user.email "{user_email}"
     git config --global user.name "{user_name}"
     git checkout -b update-docs
