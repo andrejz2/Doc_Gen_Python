@@ -88,6 +88,8 @@ def create_pull_request(docs_folder, github_creds, github_repo, branch, user_ema
     commands = f"""
     echo "ls 1"
     ls
+    echo "ls generated_docs"
+    ls generated_docs
     cd entservices-apis
     echo "ls 2"
     ls
