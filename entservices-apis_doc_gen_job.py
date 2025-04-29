@@ -63,16 +63,15 @@ def process_changed_files(changed_files):
     """Stage: Process Changed Files"""
     print("Stage: Process Changed Files")
     failed_files = []
-    run_command("cd entservices-apis")
-    run_command("ls")
 
     for file in changed_files:
         try:
-            run_command("cd entservices-apis")
-            run_command('echo "neted ls"')
-            run_command("ls")
             print(f"Processing file: {file}")
-            run_command(f"python3 tools/md_from_h_generator/generate_md_from_header.py {file}")
+            command = f"""
+            cd entservices-apis
+            python3 tools/md_from_h_generator/generate_md_from_header.py {file}
+            """
+            run_command(command)
         except Exception as e:
             print(f"Failed to process file: {file}")
             failed_files.append(file)
