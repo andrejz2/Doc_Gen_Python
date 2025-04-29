@@ -51,8 +51,6 @@ def check_for_changes(apis_folder):
     """
     changed_files = run_command(command, capture_output=True)
     if changed_files:
-        os.makedirs('generated_docs', exist_ok=True)
-        os.makedirs('logs', exist_ok=True)
         print(f"Changed .h files in the last week:\n{changed_files}")
         return changed_files.splitlines()
     else:
@@ -88,11 +86,11 @@ def create_pull_request(docs_folder, github_creds, github_repo, branch, user_ema
     commands = f"""
     echo "ls 1"
     ls
-    echo "ls generated_docs"
-    ls generated_docs
     cd entservices-apis
     echo "ls 2"
     ls
+    echo "ls tools/md_from_h_generator/generated_docs"
+    ls ls tools/md_from_h_generator/generated_docs
     cp -r ../generated_docs/*.md {docs_folder}/apis/ || echo "No files to copy."
     git config --global user.email "{user_email}"
     git config --global user.name "{user_name}"
