@@ -67,8 +67,9 @@ def process_changed_files(changed_files):
 
     for file in changed_files:
         try:
+            run_command("ls")
             print(f"Processing file: {file}")
-            print("entservices-apis directory contents:", os.listdir('entservices-apis'))
+            print("entservices-apis/tools directory contents:", os.listdir(entservices-apis/tools))
             run_command(f"python3 tools/md_from_h_generator/generate_md_from_header.py {file}")
         except Exception as e:
             print(f"Failed to process file: {file}")
