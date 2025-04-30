@@ -47,7 +47,7 @@ def check_for_changes(apis_folder):
     print("Stage: Check for Changes")
     command = f"""
     cd entservices-apis
-    git log --since='8 days ago' --pretty=format: --name-only | grep "^{apis_folder}/.I*\\.h$" || true
+    git log --since='8 days ago' --pretty=format: --name-only | grep "^{apis_folder}/.*\\.h$" || true
     """
     changed_files = run_command(command, capture_output=True)
     if changed_files:
