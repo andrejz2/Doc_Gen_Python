@@ -86,8 +86,9 @@ def create_pull_request(docs_folder, github_creds, github_repo, branch, user_ema
     print("Stage: Create Pull Request")
     commands = f"""
     cd entservices-apis
+    rm -rf tools/md_from_h_generator/generated_docs/test.md
     cp -r tools/md_from_h_generator/generated_docs/*.md {docs_folder}/apis/ || echo "No files to copy."
-    rm -rf tools/md_from_h_generator/generated_docs/*
+    rm -rf tools/md_from_h_generator/generated_docs/*.md
     git config --global user.email "{user_email}"
     git config --global user.name "{user_name}"
     git checkout -b update-docs
