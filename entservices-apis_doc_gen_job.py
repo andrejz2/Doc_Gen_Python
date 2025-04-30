@@ -47,7 +47,7 @@ def check_for_changes(apis_folder):
     print("Stage: Check for Changes")
     command = f"""
     cd entservices-apis
-    git log --since='8 days ago' --pretty=format: --name-only | grep "^{apis_folder}/.*\\.h$" || true
+    git log --since='8 days ago' --pretty=format: --name-only | grep "^{apis_folder}/.I*\\.h$" || true
     """
     changed_files = run_command(command, capture_output=True)
     if changed_files:
@@ -63,6 +63,8 @@ def process_changed_files(changed_files):
     failed_files = []
 
     for file in changed_files:
+        if file == "apis/Ids.h":
+            continue
         try:
             print(f"Processing file: {file}")
             command = f"""
