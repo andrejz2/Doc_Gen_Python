@@ -94,7 +94,7 @@ def create_pull_request(docs_folder, github_creds, github_repo, branch, user_ema
     git checkout -b update-docs
     git add {docs_folder}/*
     git commit -m "Automated update of documentation" || echo "Nothing to commit."
-    git push -f https://{github_creds}@github.com/{github_repo}.git update-docs || echo "Push failed."
+    git push https://{github_creds}@github.com/{github_repo}.git update-docs || echo "Push failed."
     """
     run_command(commands)
 
