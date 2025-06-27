@@ -123,7 +123,7 @@ def main():
         checkout_code('develop', GITHUB_CREDS, USER_NAME)
         changed_files = check_for_changes(APIS_FOLDER)
         process_changed_files(changed_files)
-        create_pull_request(DOCS_FOLDER, GITHUB_CREDS, GITHUB_REPO, BRANCH, USER_EMAIL, USER_NAME)
+        # create_pull_request(DOCS_FOLDER, GITHUB_CREDS, GITHUB_REPO, BRANCH, USER_EMAIL, USER_NAME)
         print("Pipeline completed successfully!")
     except Exception as e:
         print(f"Pipeline failed: {e}")
