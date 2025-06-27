@@ -22,25 +22,15 @@ def run_command(command, cwd=None, capture_output=False):
         print(f"Error message: {e.stderr if e.stderr else e}")
         sys.exit(1)
 
-def checkout_code(apis_folder, docs_folder, tools_folder, github_repo, branch, github_creds):
+def checkout_code(branch, github_creds, user_name):
     """Stage: Checkout"""
     print("Stage: Checkout")
     if os.path.exists('entservices-apis'):
         shutil.rmtree('entservices-apis')
     os.makedirs('entservices-apis', exist_ok=True)
 
-    commands = f"""
-    git init entservices-apis
-    cd entservices-apis
-    git config core.sparseCheckout true
-    echo "{apis_folder}" >> .git/info/sparse-checkout
-    echo "{docs_folder}" >> .git/info/sparse-checkout
-    echo "{tools_folder}" >> .git/info/sparse-checkout
-    git remote add origin https://{github_creds}@github.com/{github_repo}.git
-    git fetch origin {branch}
-    git reset --hard origin/{branch}
-    """
-    run_command(commands)
+    clone_cmd = f"git clone --branch {branch} https://{user_name}:{github_creds}@github.com/rdkcentral/entservices-apis.git entservices-apis"
+    run_command(clone_cmd)
 
 def check_for_changes(apis_folder):
     """Stage: Check for Changes"""
@@ -130,7 +120,7 @@ def main():
     TOOLS_FOLDER = 'tools'
 
     try:
-        checkout_code(APIS_FOLDER, DOCS_FOLDER, TOOLS_FOLDER, GITHUB_REPO, 'develop', GITHUB_CREDS)
+        checkout_code('develop', GITHUB_CREDS, USER_NAME)
         changed_files = check_for_changes(APIS_FOLDER)
         process_changed_files(changed_files)
         create_pull_request(DOCS_FOLDER, GITHUB_CREDS, GITHUB_REPO, BRANCH, USER_EMAIL, USER_NAME)
