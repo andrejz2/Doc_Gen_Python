@@ -73,20 +73,32 @@ def process_changed_files(changed_files):
 
 def create_pull_request(docs_folder, github_creds, github_repo, branch, user_email, user_name):
     """Stage: Create Pull Request"""
-    print("Stage: Create Pull Request")
     commands = f"""
     cd entservices-apis
+    git fetch origin
+    git checkout develop
+    git pull origin develop
+    git checkout -b update-docs || git checkout update-docs
+    git rebase origin/develop || git merge origin/develop
     rm -rf tools/md_from_h_generator/generated_docs/test.md
     cp -r tools/md_from_h_generator/generated_docs/*.md {docs_folder}/apis/ || echo "No files to copy."
     rm -rf tools/md_from_h_generator/generated_docs/*.md
     git config --global user.email "{user_email}"
     git config --global user.name "{user_name}"
-    git checkout -b update-docs
     git add {docs_folder}/*
     git commit -m "Automated update of documentation" || echo "Nothing to commit."
-    git push https://{github_creds}@github.com/{github_repo}.git update-docs || echo "Push failed."
+    git push https://{user_name}:{github_creds}@github.com/rdkcentral/entservices-apis.git update-docs || echo "Push failed."
     """
     run_command(commands)
+
+    pr_check_cmd = f"""
+    curl -s -H "Authorization: token {github_creds}" \
+        https://api.github.com/repos/{github_repo}/pulls?head={github_repo.split('/')[0]}:update-docs&base={branch}
+    """
+    pr_check_result = run_command(pr_check_cmd, capture_output=True)
+    if pr_check_result and pr_check_result.strip() != "[]":
+        print("A pull request for 'update-docs' already exists. Skipping PR creation.")
+        return
 
     pr_data = {
         "title": "Automated update of documentation",
