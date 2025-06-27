@@ -24,50 +24,56 @@ def run_command(command, cwd=None, capture_output=False):
 
 def checkout_code(branch, github_creds, user_name):
     """Stage: Checkout"""
-    print("Stage: Checkout")
+    stage_decl_cmd = "echo 'Stage: Checkout'"
+    run_command(stage_decl_cmd)
+
     if os.path.exists('entservices-apis'):
         shutil.rmtree('entservices-apis')
     os.makedirs('entservices-apis', exist_ok=True)
-
     clone_cmd = f"git clone --branch {branch} https://{user_name}:{github_creds}@github.com/rdkcentral/entservices-apis.git entservices-apis"
     run_command(clone_cmd)
 
 def check_for_changes(apis_folder):
     """Stage: Check for Changes"""
-    print("Stage: Check for Changes")
-    command = f"""
+    stage_decl_cmd = "echo 'Stage: Check for Changes'"
+    run_command(stage_decl_cmd)
+
+    check_changes_cmd = f"""
     cd entservices-apis
     git log --since='8 days ago' --pretty=format: --name-only | grep "^{apis_folder}/.*/I.*\\.h$" || true
     """
-    changed_files = run_command(command, capture_output=True)
+    changed_files = run_command(check_changes_cmd, capture_output=True)
     if changed_files:
-        print(f"Changed .h files in the last week:\n{changed_files}")
-        return changed_files.splitlines()
+        for file in changed_files.splitlines():
+            run_command(f"echo {file}")
+            return changed_files.splitlines()
     else:
-        print("No .h files changed in the last week.")
+        run_command('echo "No .h files changed in the last week."')
         sys.exit(0)
 
 def process_changed_files(changed_files):
     """Stage: Process Changed Files"""
-    print("Stage: Process Changed Files")
-    failed_files = []
+    stage_decl_cmd = "echo 'Stage: Process Changed Files'"
+    run_command(stage_decl_cmd)
 
+    failed_files = []
     for file in changed_files:
         if file == "apis/Ids.h":
             continue
         try:
-            print(f"Processing file: {file}")
-            command = f"""
+            run_command(f"echo 'Processing file: {file}'")
+            run_doc_gen_script_cmd = f"""
             cd entservices-apis
             python3 tools/md_from_h_generator/generate_md_from_header.py {file}
             """
-            run_command(command)
+            run_command(run_doc_gen_script_cmd)
         except Exception as e:
-            print(f"Failed to process file: {file}")
+            run_command(f"echo 'Failed to process {file}: {e}'")
             failed_files.append(file)
 
     if failed_files:
-        print(f"The following files failed to process:\n{failed_files}")
+        for file in failed_files:
+            run_command(f"echo 'Failed to process file: {file}'")
         with open('logs/failed_files.log', 'w') as log_file:
             log_file.write('\n'.join(failed_files))
 
@@ -78,11 +84,9 @@ def create_pull_request(docs_folder, github_creds, github_repo, branch, user_ema
     git fetch origin
     git checkout develop
     git pull origin develop
-    git checkout -b update-docs || git checkout update-docs
-    git rebase origin/develop || git merge origin/develop
+    git checkout -b update-docs
     rm -rf tools/md_from_h_generator/generated_docs/test.md
     cp -r tools/md_from_h_generator/generated_docs/*.md {docs_folder}/apis/ || echo "No files to copy."
-    rm -rf tools/md_from_h_generator/generated_docs/*.md
     git config --global user.email "{user_email}"
     git config --global user.name "{user_name}"
     git add {docs_folder}/*
@@ -97,7 +101,7 @@ def create_pull_request(docs_folder, github_creds, github_repo, branch, user_ema
     """
     pr_check_result = run_command(pr_check_cmd, capture_output=True)
     if pr_check_result and pr_check_result.strip() != "[]":
-        print("A pull request for 'update-docs' already exists. Skipping PR creation.")
+        run_command("echo 'A pull request for 'update-docs' already exists. Skipping PR creation.'")
         return
 
     pr_data = {
@@ -106,13 +110,13 @@ def create_pull_request(docs_folder, github_creds, github_repo, branch, user_ema
         "head": "update-docs",
         "base": branch
     }
-    pr_command = f"""
+    pr_cmd = f"""
     curl -X POST -H "Authorization: token {github_creds}" \
         -H "Accept: application/vnd.github.v3+json" \
         https://api.github.com/repos/{github_repo}/pulls \
         -d '{json.dumps(pr_data)}'
     """
-    run_command(pr_command)
+    run_command(pr_cmd)
 
 def main():
     parser = argparse.ArgumentParser(description="Run the documentation generation job.")
@@ -129,7 +133,6 @@ def main():
     USER_EMAIL = 'azerom960@cable.comcast.com'
     APIS_FOLDER = 'apis'
     DOCS_FOLDER = 'docs'
-    TOOLS_FOLDER = 'tools'
 
     try:
         checkout_code('develop', GITHUB_CREDS, USER_NAME)
