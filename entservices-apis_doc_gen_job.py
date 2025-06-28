@@ -97,7 +97,7 @@ def create_pull_request(docs_folder, github_creds, github_repo, branch, user_ema
 
     pr_check_cmd = f"""
     curl -s -H "Authorization: token {github_creds}" \
-        https://api.github.com/repos/{github_repo}/pulls?head={github_repo.split('/')[0]}:update-docs&base={branch}
+        "https://api.github.com/repos/{github_repo}/pulls?head=update-docs&base={branch}"
     """
     pr_check_result = run_command(pr_check_cmd, capture_output=True)
     if pr_check_result and pr_check_result.strip() != "[]":
