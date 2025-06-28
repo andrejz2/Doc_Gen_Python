@@ -85,6 +85,8 @@ def create_pull_request(docs_folder, github_creds, github_repo, branch, user_ema
     git checkout develop
     git pull origin develop
     git checkout -b update-docs
+    git pull --rebase origin update-docs || true
+    git rebase origin/develop || git merge origin/develop
     rm -rf tools/md_from_h_generator/generated_docs/test.md
     cp -r tools/md_from_h_generator/generated_docs/*.md {docs_folder}/apis/ || echo "No files to copy."
     git config --global user.email "{user_email}"
