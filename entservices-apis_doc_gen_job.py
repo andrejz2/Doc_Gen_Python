@@ -22,8 +22,8 @@ def run_command(command, cwd=None, capture_output=False):
         print(f"Error message: {e.stderr if e.stderr else e}")
         sys.exit(1)
 
-def checkout_code(branch, github_creds, user_name):
-    """Stage: Checkout"""
+def clone_repo(branch, github_creds, user_name):
+    """Stage: Clone Repository"""
     stage_decl_cmd = "echo 'Stage: Checkout'"
     run_command(stage_decl_cmd)
 
@@ -77,9 +77,12 @@ def process_changed_files(changed_files):
         with open('logs/failed_files.log', 'w') as log_file:
             log_file.write('\n'.join(failed_files))
 
-def create_pull_request(docs_folder, github_creds, github_repo, branch, user_email, user_name):
-    """Stage: Create Pull Request"""
-    commands = f"""
+def push_files_to_branch(docs_folder, github_creds, user_email, user_name):
+    """Stage: Push Files to Branch"""
+    stage_decl_cmd = "echo 'Stage: Push Files to Branch'"
+    run_command(stage_decl_cmd)
+
+    rebase_or_push_cmd = f"""
     cd entservices-apis
     git fetch origin
     git checkout develop
@@ -95,11 +98,16 @@ def create_pull_request(docs_folder, github_creds, github_repo, branch, user_ema
     git commit -m "Automated update of documentation" || echo "Nothing to commit."
     git push https://{user_name}:{github_creds}@github.com/rdkcentral/entservices-apis.git update-docs || echo "Push failed."
     """
-    run_command(commands)
+    run_command(rebase_or_push_cmd)
+
+def create_pull_request(github_creds, user_name, github_repo, branch):
+    """Stage: Create Pull Request"""
+    stage_decl_cmd = "echo 'Stage: Create Pull Request'"
+    run_command(stage_decl_cmd)
 
     pr_check_cmd = f"""
     curl -s -H "Authorization: token {github_creds}" \
-        "https://api.github.com/repos/{github_repo}/pulls?head=update-docs&base={branch}"
+        "https://api.github.com/repos/{github_repo}/pulls?head={user_name}:update-docs&base={branch}"
     """
     pr_check_result = run_command(pr_check_cmd, capture_output=True)
     if pr_check_result and pr_check_result.strip() != "[]":
@@ -137,10 +145,11 @@ def main():
     DOCS_FOLDER = 'docs'
 
     try:
-        checkout_code('develop', GITHUB_CREDS, USER_NAME)
+        clone_repo('develop', GITHUB_CREDS, USER_NAME)
         changed_files = check_for_changes(APIS_FOLDER)
         process_changed_files(changed_files)
-        create_pull_request(DOCS_FOLDER, GITHUB_CREDS, GITHUB_REPO, BRANCH, USER_EMAIL, USER_NAME)
+        push_files_to_branch(DOCS_FOLDER, GITHUB_CREDS, USER_EMAIL, USER_NAME)
+        create_pull_request(GITHUB_CREDS, USER_NAME, GITHUB_REPO, BRANCH)
         print("Pipeline completed successfully!")
     except Exception as e:
         print(f"Pipeline failed: {e}")
