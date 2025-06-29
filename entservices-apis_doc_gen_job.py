@@ -110,9 +110,9 @@ def create_pull_request(github_creds, user_name, github_repo, branch):
         "https://api.github.com/repos/{github_repo}/pulls?head={user_name}:update-docs&base={branch}"
     """
     pr_check_result = run_command(pr_check_cmd, capture_output=True)
-    if pr_check_result and pr_check_result.strip() != "[]":
-        run_command("echo 'A pull request for 'update-docs' already exists. Skipping PR creation.'")
-        return
+    # if pr_check_result and pr_check_result.strip() != "[]":
+        # run_command("echo 'A pull request for 'update-docs' already exists. Skipping PR creation.'")
+        # return
 
     pr_data = {
         "title": "Automated update of documentation",
