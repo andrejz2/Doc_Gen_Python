@@ -4,6 +4,7 @@ import sys
 import shutil
 import json
 import argparse
+import datetime
 
 def run_command(command, cwd=None, capture_output=False):
     """Run a shell command and handle errors."""
@@ -82,42 +83,42 @@ def push_files_to_branch(docs_folder, github_creds, user_email, user_name):
     stage_decl_cmd = "echo 'Stage: Push Files to Branch'"
     run_command(stage_decl_cmd)
 
+    # unique branch name using date (keeps track of doc updates for different weeks)
+    date_suffix = datetime.datetime.now().strftime('%Y%m%d')
+    unique_branch_name = f"update-docs-{date_suffix}"
+    new_branch_cmd = "echo 'New branch created: {unique_branch_name}'"
+    run_command(new_branch_cmd)
+
     rebase_or_push_cmd = f"""
     cd entservices-apis
     git fetch origin
     git checkout develop
     git pull origin develop
-    git checkout -b update-docs
-    git pull --rebase origin update-docs || true
-    git rebase origin/develop || git merge origin/develop
+    git checkout -B {unique_branch_name} origin/develop
     rm -rf tools/md_from_h_generator/generated_docs/test.md
     cp -r tools/md_from_h_generator/generated_docs/*.md {docs_folder}/apis/ || echo "No files to copy."
     git config --global user.email "{user_email}"
     git config --global user.name "{user_name}"
-    git add {docs_folder}/*
-    git commit -m "Automated update of documentation" || echo "Nothing to commit."
-    git push https://{user_name}:{github_creds}@github.com/rdkcentral/entservices-apis.git update-docs || echo "Push failed."
+    git add {docs_folder}/apis/*.md
+    git commit -m "Automated update of documentation ({date_suffix})" || echo "Nothing to commit."
+    git push https://{user_name}:{github_creds}@github.com/rdkcentral/entservices-apis.git {unique_branch_name} || echo "Push failed."
     """
-    run_command(rebase_or_push_cmd)
+    try:
+        run_command(rebase_or_push_cmd)
+        return unique_branch_name
+    exception as e:
+        print(f"Failed to push branch: {e}")
+        sys.exit(1)
 
-def create_pull_request(github_creds, user_name, github_repo, branch):
+def create_pull_request(github_creds, user_name, github_repo, branch, unique_branch_name):
     """Stage: Create Pull Request"""
     stage_decl_cmd = "echo 'Stage: Create Pull Request'"
     run_command(stage_decl_cmd)
 
-    pr_check_cmd = f"""
-    curl -s -H "Authorization: token {github_creds}" \
-        "https://api.github.com/repos/{github_repo}/pulls?head={user_name}:update-docs&base={branch}"
-    """
-    pr_check_result = run_command(pr_check_cmd, capture_output=True)
-    # if pr_check_result and pr_check_result.strip() != "[]":
-        # run_command("echo 'A pull request for 'update-docs' already exists. Skipping PR creation.'")
-        # return
-
     pr_data = {
-        "title": "Automated update of documentation",
+        "title": "Automated update of documentation ({unique_branch_name})",
         "body": "This is an automated pull request to update the documentation.",
-        "head": "update-docs",
+        "head": unique_branch_name,
         "base": branch
     }
     pr_cmd = f"""
@@ -148,8 +149,8 @@ def main():
         clone_repo('develop', GITHUB_CREDS, USER_NAME)
         changed_files = check_for_changes(APIS_FOLDER)
         process_changed_files(changed_files)
-        push_files_to_branch(DOCS_FOLDER, GITHUB_CREDS, USER_EMAIL, USER_NAME)
-        create_pull_request(GITHUB_CREDS, USER_NAME, GITHUB_REPO, BRANCH)
+        unique_branch_name = push_files_to_branch(DOCS_FOLDER, GITHUB_CREDS, USER_EMAIL, USER_NAME)
+        create_pull_request(GITHUB_CREDS, USER_NAME, GITHUB_REPO, BRANCH, unique_branch_name)
         print("Pipeline completed successfully!")
     except Exception as e:
         print(f"Pipeline failed: {e}")
