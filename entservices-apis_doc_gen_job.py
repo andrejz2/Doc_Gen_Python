@@ -106,7 +106,7 @@ def push_files_to_branch(docs_folder, github_creds, user_email, user_name):
     try:
         run_command(rebase_or_push_cmd)
         return unique_branch_name
-    exception as e:
+    except Exception as e:
         print(f"Failed to push branch: {e}")
         sys.exit(1)
 
