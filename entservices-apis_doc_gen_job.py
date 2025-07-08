@@ -116,8 +116,8 @@ def create_pull_request(github_creds, user_name, github_repo, branch, unique_bra
     run_command(stage_decl_cmd)
 
     pr_data = {
-        "title": "Automated update of documentation ({unique_branch_name})",
-        "body": "This is an automated pull request to update the documentation.",
+        "title": f"Automated update of documentation ({doc_branch_name})",
+        "body": f"This is an automated pull request to update documentation. Generated from branch {doc_branch_name}.",
         "head": unique_branch_name,
         "base": branch
     }
